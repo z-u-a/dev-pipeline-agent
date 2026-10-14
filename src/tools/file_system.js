@@ -1,6 +1,8 @@
 // src/tools/fileSystem.js
 import fs from 'fs';
 import path from 'path';
+import { PDFParse } from 'pdf-parse';
+
 
 export const declarations = [
   {
@@ -63,5 +65,37 @@ export function writeFile({ filePath, content }) {
     return { result: `Success: Wrote file to ${filePath} (${sizeKB} KB)` };
   } catch (error) {
     return { error: `Write error: ${error.message}` };
+  }
+}
+
+
+export async function parseResumeFile(filePath) {
+  try {
+    const resolvedPath = path.resolve(filePath);
+    if (!fs.existsSync(resolvedPath)) {
+      return { error: `File not found at: ${filePath}` };
+    }
+
+    const extension = path.extname(resolvedPath).toLowerCase();
+
+    // 1. If it's a standard text file, read it natively
+    if (extension === '.txt' || extension === '.md') {
+      const content = fs.readFileSync(resolvedPath, 'utf-8');
+      return { content };
+    }
+
+    // 2. If it's a PDF, read it as a binary buffer and parse out the layout text
+    if (extension === '.pdf') {
+      console.log("[Parser]: Extracting raw metadata text from PDF structure...");
+      const dataBuffer = fs.readFileSync(resolvedPath);
+      const parser = new PDFParse({url: resolvedPath});
+      const result = await parser.getText();
+      await parser.destroy();
+      return result.text;
+    }
+
+    return { error: `Unsupported file format: '${extension}'. Please use .txt, .md, or .pdf.` };
+  } catch (error) {
+    return { error: `Extraction engine failure: ${error.message}` };
   }
 }

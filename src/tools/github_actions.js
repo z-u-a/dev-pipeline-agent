@@ -52,7 +52,7 @@ export function cloneRepository({ repoUrl, repoName }) {
     // Create the root workspace directory if it's missing
     fs.mkdirSync(path.dirname(targetWorkspace), { recursive: true });
 
-    console.log(`📥 [Git CLI]: Cloning remote repo down to: ${targetWorkspace}`);
+    console.log(`[Git CLI]: Cloning remote repo down to: ${targetWorkspace}`);
     
     // Run native git clone shell command
     execSync(`git clone ${repoUrl} "${targetWorkspace}"`, { stdio: 'inherit' });
