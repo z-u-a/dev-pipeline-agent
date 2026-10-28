@@ -1,6 +1,6 @@
 // src/agents/coding/agent.js
-import { readFile, writeFile } from '../../tools/fileSystem.js';
-import { pushToGitHub } from '../../tools/githubActions.js';
+import { readFile, writeFile } from '../tools/file_system.js';
+import { pushToGitHub } from '../tools/github_actions.js';
 
 export const codingInstructions = `
 You are an expert Autonomous Software Engineer specializing in rapid frontend compilation and clean deployment pipelines. 

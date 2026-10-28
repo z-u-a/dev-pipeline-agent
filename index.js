@@ -1,5 +1,5 @@
 // index.js
-import { genai } from '@google/genai';
+import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -10,7 +10,7 @@ import { runPlanningAgent } from './src/agents/planning.js';
 import { runCodingAgent } from './src/agents/coding.js';
 
 // Import our Infrastructure Automation Tools
-import { createGitHubRepository, cloneRepository } from './src/tools/githubActions.js';
+import { createGitHubRepository, cloneRepository } from './src/tools/github_actions.js';
 
 // Load secure tokens from .env file
 dotenv.config();
@@ -22,7 +22,8 @@ if (!process.env.GEMINI_API_KEY || !process.env.GITHUB_TOKEN) {
 }
 
 // Initialize the official Google GenAI Client
-const client = new genai.Client();
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
 
 async function executeDevPipeline() {
   console.log("=====================================================");
@@ -112,4 +113,4 @@ async function executeDevPipeline() {
 }
 
 // Launch the software engineering pipeline
-executeDevPipeline();
+//executeDevPipeline();
