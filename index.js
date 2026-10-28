@@ -31,10 +31,10 @@ async function executeDevPipeline() {
   console.log("=====================================================\n");
 
   const pipelineState = new PipelineState();
-  const inputRequirementsPath = './resume.txt';
+  const inputRequirementsPath = './resume1.txt';
   
   // Choose an intuitive, unique name for your new automated portfolio repo
-  const dynamicRepoName = `autonomous-portfolio-${Date.now().toString().slice(-4)}`;
+  const dynamicRepoName = `portfolio-site`;
 
   // =================================================================
   // PHASE 1: SYSTEM ARCHITECTURE PLANNING (Planning Agent)
@@ -113,4 +113,5 @@ async function executeDevPipeline() {
 }
 
 // Launch the software engineering pipeline
-//executeDevPipeline();
+executeDevPipeline();
+

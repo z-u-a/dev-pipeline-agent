@@ -7,7 +7,7 @@ Status: learning project exploring multi-agent orchestration. It has no automate
 ## Pipeline
 
 1. **Input.** The resume is read from `./resume.txt` in the project root.
-2. **Planning agent** (`src/agents/planning.js`). The model reads the resume with a `readFile` tool and writes a markdown blueprint to `src/agents/planning/portfolio_blueprint.md` with a `writeFile` tool. Its instructions focus the plan on backend engineering work. Temperature 0.2.
+2. **Planning agent** (`src/agents/planning.js`). The model reads the resume with a `readFile` tool and writes a markdown blueprint to `./output/portfolio_blueprint.md` with a `writeFile` tool. Its instructions focus the plan on backend engineering work. Temperature 0.2.
 3. **Repository setup** (`src/tools/github_actions.js`, plain code, no model involved). Creates a public repository named `autonomous-portfolio-<4 digits>` through the GitHub API (Octokit) with an initial commit, then clones it into `./workspace/<repo name>`.
 4. **Coding agent** (`src/agents/coding.js`). The model reads the blueprint, writes a single-file `index.html` that uses the Tailwind CSS CDN into the cloned workspace, then calls a `pushToGitHub` tool. That tool runs `git add .`, `git commit`, `git branch -M main` and `git push -u origin main --force`. Temperature 0.1.
 5. **Result.** The script prints whether the run completed and the name of the new repository.

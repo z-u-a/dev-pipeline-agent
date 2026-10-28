@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { PDFParse } from 'pdf-parse';
 const ALLOWED_READ = [path.resolve('./resume1.txt'), path.resolve('./output/portfolio_blueprint.md')];
-const ALLOWED_WRITE = [path.resolve('./output/portfolio_blueprint.md')];
+const ALLOWED_WRITE = [path.resolve('./output/portfolio_blueprint.md'), path.resolve('./workspace/portfolio-site/index.html')];
 
 export const declarations = [
   {
