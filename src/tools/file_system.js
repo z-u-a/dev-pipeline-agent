@@ -1,8 +1,8 @@
-// src/tools/fileSystem.js
 import fs from 'fs';
 import path from 'path';
 import { PDFParse } from 'pdf-parse';
-
+const ALLOWED_READ = [path.resolve('./resume1.txt'), path.resolve('./output/portfolio_blueprint.md')];
+const ALLOWED_WRITE = [path.resolve('./output/portfolio_blueprint.md')];
 
 export const declarations = [
   {
@@ -34,6 +34,11 @@ export const declarations = [
 export function readFile({ filePath }) {
   try {
     const resolvedPath = path.resolve(filePath);
+
+    if (!ALLOWED_READ.includes(resolvedPath)) {
+      return { error: 'Access denied: path not allowed.' };
+    }
+
     if (!fs.existsSync(resolvedPath)) {
       return { error: `File not found at: ${filePath}` };
     }
@@ -50,6 +55,10 @@ export function readFile({ filePath }) {
 export function writeFile({ filePath, content }) {
   try {
     const resolvedPath = path.resolve(filePath);
+    
+    if (!ALLOWED_WRITE.includes(resolvedPath)) {
+      return { error: 'Access denied: path not allowed.' };
+    }
     const dir = path.dirname(resolvedPath);
 
     // Create directories if they don't exist
@@ -88,7 +97,7 @@ export async function parseResumeFile(filePath) {
     if (extension === '.pdf') {
       console.log("[Parser]: Extracting raw metadata text from PDF structure...");
       const dataBuffer = fs.readFileSync(resolvedPath);
-      const parser = new PDFParse({url: resolvedPath});
+      const parser = new PDFParse({ url: resolvedPath });
       const result = await parser.getText();
       await parser.destroy();
       return result.text;

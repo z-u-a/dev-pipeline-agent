@@ -1,6 +1,6 @@
 // src/agents/planning/agent.js
 import path from 'path';
-import { readFile, writeFile } from '../tools/file_system.js';
+import { declarations as planningToolDeclarations, readFile, writeFile } from '../tools/file_system.js';
 
 export const planningInstructions = `
 You are an expert Frontend Architect specializing in Developer Portfolios. Your sole job is to review a user's raw text resume, extract their technical achievements, and design a structured web portfolio layout plan.
@@ -19,7 +19,7 @@ export async function runPlanningAgent(client, state, resumePath) {
 
   try {
     const absoluteResumePath = path.resolve(resumePath);
-    const absoluteBlueprintPath = path.resolve('src/agents/planning/portfolio_blueprint.md');
+    const absoluteBlueprintPath = path.resolve('./output/portfolio_blueprint.md');
 
     const initialPrompt = `
       Begin your system planning workflow:
@@ -45,7 +45,10 @@ export async function runPlanningAgent(client, state, resumePath) {
     });
 
     // The Manual ReAct Loop
+    let turnCount = 0;
     while (response.functionCalls && response.functionCalls.length > 0) {
+      turnCount++;
+      console.log(`\n[Planning Agent Loop]: Turn ${turnCount}`);
       // 1. Append the model's response (containing its tool selection intent) to history
       contentsHistory.push(response.candidates[0].content);
 
@@ -65,7 +68,6 @@ export async function runPlanningAgent(client, state, resumePath) {
         }
 
         console.log(`[Tool System Output]:`, toolResult);
-
         // Map the execution outcome into a valid functionResponse object matching call ID
         functionResponses.push({
           name: name,
@@ -80,6 +82,7 @@ export async function runPlanningAgent(client, state, resumePath) {
         parts: functionResponses.map(res => ({ functionResponse: res }))
       });
 
+      console.log(`\n[Calling Agent]: Turn ${turnCount}`);
       // 4. Request the next cognitive processing step passing full manual sequence
       response = await client.models.generateContent({
         model: process.env.PLANNING_MODEL || 'gemini-2.5-flash',
