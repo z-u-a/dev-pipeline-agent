@@ -71,14 +71,17 @@ export async function runCodingAgent(client, state, prompt) {
     });
 
     // The Manual ReAct Loop
-    while (response.functionCalls && response.functionCalls.length > 0) {
+    const MAX_TURNS = 8;
+    let turnCount = 0;
+
+    while (response.functionCalls && response.functionCalls.length > 0 && turnCount++ < MAX_TURNS) {
       // 1. Record model's recent tool calls block into tracking history
       contentsHistory.push(response.candidates[0].content);
 
       const functionResponses = [];
       for (const call of response.functionCalls) {
         const { name, args, id } = call;
-        console.log(`\n🛠️  [Coding Agent Thought]: Invoking tool '${name}' with args:`, args);
+        console.log(`\n [Coding Agent Thought]: Invoking tool '${name}' with args:`, args);
 
         let toolResult;
         if (name === 'readFile') {
@@ -118,7 +121,10 @@ export async function runCodingAgent(client, state, prompt) {
       });
     }
 
+    if (!state.pushed) { state.logError('CodingAgent', 'Did not validate and push within the turn limit'); return false; }
+
     state.transitionTo('COMPLETED');
+
     console.log("[Coding Agent]: Task completed. Portfolio compiled and pushed to remote branch successfully.");
     return true;
 

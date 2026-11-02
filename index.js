@@ -31,7 +31,7 @@ async function executeDevPipeline() {
   console.log("=====================================================\n");
 
   const pipelineState = new PipelineState();
-  const inputRequirementsPath = './resume1.txt';
+  const inputRequirementsPath = './resume.txt';
   
   // Choose an intuitive, unique name for your new automated portfolio repo
   const dynamicRepoName = `portfolio-site`;
@@ -114,4 +114,8 @@ async function executeDevPipeline() {
 
 // Launch the software engineering pipeline
 executeDevPipeline();
+// (async () => {
+  
+//   await runCodingAgent(client, new PipelineState("CODING"));
+// })();
 
