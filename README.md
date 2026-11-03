@@ -74,3 +74,37 @@ src/tools/github_actions.js    create repository, clone, commit and push
 - The push uses `--force`. That is only safe because the repository was just created.
 - The `workspace/` folder, where repositories are cloned, is not listed in `.gitignore`.
 - No automated tests.
+
+## Next steps: HTML validation loop
+
+Planned change that turns the coding agent from a fixed sequence into a feedback loop, so the model's next action depends on a check it did not write itself.
+
+### Goal
+
+The coding agent must not push a page that fails validation. After writing `index.html`, it validates the file, reads the errors, fixes them and validates again, until the file passes or the turn limit is reached.
+
+### Design
+
+1. **New tool `validateHtml`** (`src/tools/validate.js`, plain code, no model involved). It returns `{ valid, errors }` and combines:
+   - generic HTML checks with the `html-validate` package
+   - project checks: the Tailwind CDN script is present, no placeholder text, a minimum page length, and at least three `<section>` blocks from the blueprint
+   - the error list is capped at 10 entries to keep the model's context small
+2. **Gate in code, not in the prompt.** The coding agent loop keeps `state.validated`. Any `writeFile` call resets it to `false`, and a passing `validateHtml` call sets it to `true`. `pushToGitHub` returns an error unless `state.validated` is `true`.
+3. **Turn limit.** The coding loop stops after `MAX_TURNS` (8) iterations. If the page was not validated and pushed by then, the run is marked `FAILED` instead of `COMPLETED`.
+4. **Prompt update.** The coding agent's instructions tell it to write the file, call `validateHtml`, fix every listed error and rewrite the whole file, and only call `pushToGitHub` after a result of `valid: true`.
+
+### Tasks
+
+- [ ] `npm install html-validate`
+- [ ] Add `src/tools/validate.js` with `validateHtml` and its declaration
+- [ ] Register the tool in `src/agents/coding.js` and add the `state.validated` gate
+- [ ] Add `MAX_TURNS` to the coding loop, and to the planning loop (which also needs its undefined `turn` variable fixed)
+- [ ] Set `state.pushed` after a successful push, and mark `COMPLETED` only when it is `true`
+- [ ] Update the coding agent's system prompt
+- [ ] Log each validation result during testing to see how many fix rounds the model needs
+
+### Done when
+
+- A page with a deliberately broken tag is rejected, fixed by the model and then pushed
+- `pushToGitHub` refuses to run when the last write has not been validated
+- A run that never produces a valid page ends as `FAILED` with the errors recorded
